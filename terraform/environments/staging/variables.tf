@@ -1,0 +1,46 @@
+variable "aws_region" {
+  description = "AWS Region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "staging"
+}
+
+variable "vpc_cidr" {
+  description = "VPC CIDR"
+  type        = string
+}
+
+variable "public_subnets_cidr" {
+  description = "Public Subnet CIDRs"
+  type        = list(string)
+}
+
+variable "private_subnets_cidr" {
+  description = "Private Subnet CIDRs"
+  type        = list(string)
+}
+
+variable "availability_zones" {
+  description = "AWS Availability Zones"
+  type        = list(string)
+}
+
+variable "node_group_min_size" {
+  type    = number
+  default = 2
+}
+
+variable "node_group_max_size" {
+  type    = number
+  default = 4
+}
+
+variable "node_instance_types" {
+  type    = list(string)
+  default = ["t3.medium"]
+}

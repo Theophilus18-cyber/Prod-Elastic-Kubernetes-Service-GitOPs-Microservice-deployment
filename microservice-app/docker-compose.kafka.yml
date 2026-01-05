@@ -1,0 +1,126 @@
+version: "3.8"
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  kafka:
+    image: confluentinc/cp-kafka:7.7.7
+    container_name: kafka
+    hostname: kafka
+    networks:
+      - app-tier
+    ports:
+      - "9092:9092"
+    environment:
+      # === KRaft mode ===
+      KAFKA_PROCESS_ROLES: "broker,controller"
+      KAFKA_NODE_ID: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+
+      # === Listeners ===
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+
+      # === Storage ===
+      KAFKA_LOG_DIRS: "/var/lib/kafka/data"
+
+      # === Dev-friendly settings ===
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+
+      # === REQUIRED for KRaft ===
+      CLUSTER_ID: "MkU3OEVBNTcwNTJENDM2Qk"
+
+    volumes:
+      - kafka-data:/var/lib/kafka/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  orders-service:
+    build:
+      context: ./backend/orders-service
+    container_name: orders-service
+    networks:
+      - app-tier
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8001:8001"
+
+  payments-service:
+    build:
+      context: ./backend/payments-service
+    container_name: payments-service
+    networks:
+      - app-tier
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8002:8002"
+
+  notifications-service:
+    build:
+      context: ./backend/notifications-service
+    container_name: notifications-service
+    networks:
+      - app-tier
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_NOTIFICATION_GROUP_ID: notifications-group
+    ports:
+      - "8003:8003"
+
+  frontend:
+    build:
+      context: ./frontend
+      target: dev
+    container_name: frontend
+    networks:
+      - app-tier
+    environment:
+      # Vite requires these to be set at build/run time to expose to the browser
+      - VITE_ORDERS_URL=http://localhost:8001
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+  delivery-service:
+    build:
+      context: ./backend/delivery-service
+    container_name: delivery-service
+    networks:
+      - app-tier
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KAFKA_DELIVERY_GROUP_ID: delivery-group
+    ports:
+      - "8005:8005"
+
+volumes:
+  kafka-data:
