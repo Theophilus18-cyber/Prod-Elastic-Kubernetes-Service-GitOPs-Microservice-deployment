@@ -9,7 +9,13 @@ commonLabels:
 
 # Image tags will be updated by CI/CD
 images:
-- name: my-repo/backend
+- name: my-repo/orders-service
+  newTag: dev-latest
+- name: my-repo/payments-service
+  newTag: dev-latest
+- name: my-repo/delivery-service
+  newTag: dev-latest
+- name: my-repo/notifications-service
   newTag: dev-latest
 - name: my-repo/frontend
   newTag: dev-latest

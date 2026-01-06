@@ -8,7 +8,13 @@ commonLabels:
   environment: staging
 
 images:
-- name: my-repo/backend
+- name: my-repo/orders-service
+  newTag: staging-latest
+- name: my-repo/payments-service
+  newTag: staging-latest
+- name: my-repo/delivery-service
+  newTag: staging-latest
+- name: my-repo/notifications-service
   newTag: staging-latest
 - name: my-repo/frontend
   newTag: staging-latest

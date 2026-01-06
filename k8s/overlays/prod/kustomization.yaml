@@ -8,7 +8,13 @@ commonLabels:
   environment: prod
 
 images:
-- name: my-repo/backend
+- name: my-repo/orders-service
+  newTag: prod-latest
+- name: my-repo/payments-service
+  newTag: prod-latest
+- name: my-repo/delivery-service
+  newTag: prod-latest
+- name: my-repo/notifications-service
   newTag: prod-latest
 - name: my-repo/frontend
   newTag: prod-latest
