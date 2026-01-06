@@ -16,7 +16,32 @@ module "eks" {
   subnet_ids      = module.network.private_subnet_ids
   node_group_min_size = var.node_group_min_size
   node_group_max_size = var.node_group_max_size
+  node_group_desired_size = var.node_group_desired_size
   node_instance_types = var.node_instance_types
+}
+
+data "aws_caller_identity" "current" {}
+
+locals {
+  oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+}
+
+module "gh_ci_role" {
+  source            = "../../modules/github-oidc"
+  environment       = var.environment
+  github_repo       = "Theophilus18-cyber/Prod-Elastic-Kubernetes-Service-GitOPs-Microservice-deployment"
+  github_branch     = "master" # Prod uses master branch
+  role_type         = "ci"
+  oidc_provider_arn = local.oidc_provider_arn
+}
+
+module "gh_infra_role" {
+  source            = "../../modules/github-oidc"
+  environment       = var.environment
+  github_repo       = "Theophilus18-cyber/Prod-Elastic-Kubernetes-Service-GitOPs-Microservice-deployment"
+  github_branch     = "master"
+  role_type         = "terraform"
+  oidc_provider_arn = local.oidc_provider_arn
 }
 
 module "vault" {

@@ -10,6 +10,14 @@ output "eks_cluster_name" {
   value = module.eks.cluster_name
 }
 
-output "vault_private_ip" {
-  value = module.vault.vault_private_ip
+output "ecr_repository_urls" {
+  value = module.ecr.repository_urls
+}
+
+output "gh_ci_role_arn" {
+  value = module.gh_ci_role.role_arn
+}
+
+output "gh_infra_role_arn" {
+  value = module.gh_infra_role.role_arn
 }

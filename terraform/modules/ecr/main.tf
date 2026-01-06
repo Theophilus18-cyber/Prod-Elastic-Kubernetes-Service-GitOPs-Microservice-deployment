@@ -14,6 +14,3 @@ resource "aws_ecr_repository" "service" {
   }
 }
 
-output "repository_urls" {
-  value = { for k, v in aws_ecr_repository.service : k => v.repository_url }
-}

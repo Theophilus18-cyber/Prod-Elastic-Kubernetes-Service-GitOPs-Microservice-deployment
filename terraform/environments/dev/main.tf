@@ -21,6 +21,35 @@ module "eks" {
   node_instance_types = var.node_instance_types
 }
 
+# Fetch the global OIDC provider (Must be created first)
+# You can construct the ARN if you know the account ID, or use a data source if supported (not easy for OIDC).
+# We will construct it assuming standard AWS partition.
+data "aws_caller_identity" "current" {}
+
+locals {
+  oidc_provider_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/token.actions.githubusercontent.com"
+}
+
+# Role for GitHub Actions CI (Build & Push) - Locked to dev branch
+module "gh_ci_role" {
+  source            = "../../modules/github-oidc"
+  environment       = var.environment
+  github_repo       = "Theophilus18-cyber/Prod-Elastic-Kubernetes-Service-GitOPs-Microservice-deployment"
+  github_branch     = "dev"
+  role_type         = "ci"
+  oidc_provider_arn = local.oidc_provider_arn
+}
+
+# Role for Terraform (Infra Management) - Locked to dev branch
+module "gh_infra_role" {
+  source            = "../../modules/github-oidc"
+  environment       = var.environment
+  github_repo       = "Theophilus18-cyber/Prod-Elastic-Kubernetes-Service-GitOPs-Microservice-deployment"
+  github_branch     = "dev"
+  role_type         = "terraform"
+  oidc_provider_arn = local.oidc_provider_arn
+}
+
 module "vault" {
   source = "../../modules/vault"
 

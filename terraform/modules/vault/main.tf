@@ -25,11 +25,37 @@ resource "aws_security_group" "vault" {
   }
 }
 
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
+# Generate SSH Key Pair for Vault
+resource "tls_private_key" "vault" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "vault" {
+  key_name   = "${var.environment}-vault-key"
+  public_key = tls_private_key.vault.public_key_openssh
+}
+
+resource "local_file" "private_key" {
+  content  = tls_private_key.vault.private_key_pem
+  filename = "${path.module}/${var.environment}-vault-key.pem"
+}
+
 resource "aws_instance" "vault" {
-  ami           = "ami-0c55b159cbfafe1f0" # Amazon Linux 2 AMI (update region specific)
+  ami           = data.aws_ami.amazon_linux_2.id
   instance_type = var.instance_type
   subnet_id     = var.subnet_id
-  key_name      = var.key_name
+  key_name      = aws_key_pair.vault.key_name
 
   vpc_security_group_ids = [aws_security_group.vault.id]
 

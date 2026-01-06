@@ -1,7 +1,4 @@
-output "backend_repository_url" {
-  value = aws_ecr_repository.backend.repository_url
-}
-
-output "frontend_repository_url" {
-  value = aws_ecr_repository.frontend.repository_url
+output "repository_urls" {
+  description = "Map of repository names to their URLs"
+  value       = { for k, v in aws_ecr_repository.service : k => v.repository_url }
 }

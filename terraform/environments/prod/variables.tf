@@ -42,5 +42,11 @@ variable "node_group_max_size" {
 
 variable "node_instance_types" {
   type    = list(string)
-  default = ["t3.large"]
+  default = ["t3.medium"]
+}
+
+variable "node_group_desired_size" {
+  description = "Desired number of worker nodes"
+  type        = number
+  default     = 3
 }
