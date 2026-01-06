@@ -9,13 +9,18 @@ commonLabels:
 
 # Image tags will be updated by CI/CD
 images:
-- name: my-repo/orders-service
-  newTag: dev-latest
-- name: my-repo/payments-service
-  newTag: dev-latest
 - name: my-repo/delivery-service
-  newTag: dev-latest
-- name: my-repo/notifications-service
-  newTag: dev-latest
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-delivery
+  newTag: 9efa6ebebc09215172d384e4f36887457829235c
 - name: my-repo/frontend
-  newTag: dev-latest
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-frontend
+  newTag: 9efa6ebebc09215172d384e4f36887457829235c
+- name: my-repo/notifications-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-notifications
+  newTag: 9efa6ebebc09215172d384e4f36887457829235c
+- name: my-repo/orders-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-orders
+  newTag: 9efa6ebebc09215172d384e4f36887457829235c
+- name: my-repo/payments-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-payments
+  newTag: 9efa6ebebc09215172d384e4f36887457829235c
