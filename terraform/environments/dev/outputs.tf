@@ -21,3 +21,7 @@ output "gh_ci_role_arn" {
 output "gh_infra_role_arn" {
   value = module.gh_infra_role.role_arn
 }
+
+output "cluster_autoscaler_role_arn" {
+  value = module.eks.cluster_autoscaler_role_arn
+}
