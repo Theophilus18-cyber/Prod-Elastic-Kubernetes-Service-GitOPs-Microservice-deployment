@@ -75,14 +75,18 @@ def create_order(order: Order) -> Order:
     orders.append(order)
 
     # Produce Kafka event for payments-service and notifications-service
+    # Send asynchronously - don't block the request waiting for Kafka
     producer = get_producer()
     if producer:
         try:
-            producer.send(KAFKA_ORDER_CREATED_TOPIC, order.dict())
-            producer.flush()
-            logger.info(f"Order {order_id} created and sent to Kafka topic: {KAFKA_ORDER_CREATED_TOPIC}")
+            # send() is asynchronous - it returns immediately
+            # The producer will buffer and send when Kafka is available
+            future = producer.send(KAFKA_ORDER_CREATED_TOPIC, order.dict())
+            logger.info(f"Order {order_id} created, Kafka message queued for topic: {KAFKA_ORDER_CREATED_TOPIC}")
+            # Don't call flush() - it blocks and can timeout
+            # Messages will be sent automatically by the producer's background thread
         except KafkaError as e:
-            logger.error(f"Failed to send order to Kafka: {e}")
+            logger.error(f"Failed to queue order to Kafka: {e}")
             # Don't fail the request if Kafka is down, order is still created
         except Exception as e:
             logger.error(f"Unexpected error sending to Kafka: {e}")

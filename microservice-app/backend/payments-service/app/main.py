@@ -133,11 +133,14 @@ def process_payment(payment_id: int):
     producer = get_producer()
     if producer:
         try:
-            producer.send(KAFKA_PAYMENT_COMPLETED_TOPIC, event)
-            producer.flush()
-            logger.info(f"Payment processed & event sent: {event}")
+            # send() is asynchronous - it returns immediately
+            # The producer will buffer and send when Kafka is available
+            future = producer.send(KAFKA_PAYMENT_COMPLETED_TOPIC, event)
+            logger.info(f"Payment processed, Kafka message queued for topic: {KAFKA_PAYMENT_COMPLETED_TOPIC}")
+            # Don't call flush() - it blocks and can timeout
+            # Messages will be sent automatically by the producer's background thread
         except KafkaError as e:
-            logger.error(f"Failed to send payment event to Kafka: {e}")
+            logger.error(f"Failed to queue payment event to Kafka: {e}")
             # Don't fail the payment if Kafka is down
         except Exception as e:
             logger.error(f"Unexpected error sending to Kafka: {e}")
