@@ -19,10 +19,10 @@ spec:
         - name: orders-service
           image: my-repo/orders-service:latest
           ports:
-            - containerPort: 8000
+            - containerPort: 8001
           env:
-            - name: DB_HOST
-              value: "postgres-host"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
           resources:
             requests:
               memory: "128Mi"

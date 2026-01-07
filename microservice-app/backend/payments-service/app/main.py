@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from kafka import KafkaConsumer, KafkaProducer
 
 
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092").split(",")
 KAFKA_ORDER_CREATED_TOPIC = os.getenv("KAFKA_ORDER_CREATED_TOPIC", "order.created")
 KAFKA_PAYMENT_COMPLETED_TOPIC = os.getenv("KAFKA_PAYMENT_COMPLETED_TOPIC", "payment.completed")
 KAFKA_PAYMENTS_GROUP_ID = os.getenv("KAFKA_PAYMENTS_GROUP_ID", "payments-group")

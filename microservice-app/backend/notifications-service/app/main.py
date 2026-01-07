@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from kafka import KafkaConsumer
 from typing import List
 
-KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092")
+KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092").split(",")
 KAFKA_ORDER_CREATED_TOPIC = os.getenv("KAFKA_ORDER_CREATED_TOPIC", "order.created")
 KAFKA_NOTIFICATION_GROUP_ID = os.getenv("KAFKA_NOTIFICATION_GROUP_ID", "notifications-group")
 
