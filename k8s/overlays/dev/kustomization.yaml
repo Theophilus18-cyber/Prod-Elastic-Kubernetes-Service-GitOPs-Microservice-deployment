@@ -11,16 +11,16 @@ commonLabels:
 images:
 - name: my-repo/delivery-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-delivery
-  newTag: 6e8a19d8db821a3e2e113bac9cbc69e476339692
+  newTag: 725ec6a0fb19ea675e9842ff81824e891be99797
 - name: my-repo/frontend
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-frontend
-  newTag: 6e8a19d8db821a3e2e113bac9cbc69e476339692
+  newTag: 725ec6a0fb19ea675e9842ff81824e891be99797
 - name: my-repo/notifications-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-notifications
-  newTag: 6e8a19d8db821a3e2e113bac9cbc69e476339692
+  newTag: 725ec6a0fb19ea675e9842ff81824e891be99797
 - name: my-repo/orders-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-orders
-  newTag: 6e8a19d8db821a3e2e113bac9cbc69e476339692
+  newTag: 725ec6a0fb19ea675e9842ff81824e891be99797
 - name: my-repo/payments-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-payments
-  newTag: 6e8a19d8db821a3e2e113bac9cbc69e476339692
+  newTag: 725ec6a0fb19ea675e9842ff81824e891be99797
