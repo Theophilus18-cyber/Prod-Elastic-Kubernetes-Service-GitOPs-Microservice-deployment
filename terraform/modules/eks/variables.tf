@@ -31,3 +31,8 @@ variable "node_instance_types" {
   type        = list(string)
   default     = ["t3.medium"]
 }
+
+variable "vpc_cidr" {
+  description = "CIDR block of the VPC"
+  type        = string
+}

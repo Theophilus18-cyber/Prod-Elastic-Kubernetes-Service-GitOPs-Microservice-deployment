@@ -1,14 +1,20 @@
 import json
 import os
-from typing import List
+import logging
+from typing import List, Optional
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from kafka import KafkaProducer
+from kafka.errors import KafkaError
 from pydantic import BaseModel
 
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092").split(",")
 KAFKA_ORDER_CREATED_TOPIC = os.getenv("KAFKA_ORDER_CREATED_TOPIC", "order.created")
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Orders Service")
 
@@ -33,10 +39,33 @@ class Order(BaseModel):
 # In-memory "database" of orders for local testing
 orders: list[Order] = []
 
-producer = KafkaProducer(
-    bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-    value_serializer=lambda v: json.dumps(v).encode("utf-8"),
-)
+# Lazy initialization of Kafka producer
+_producer: Optional[KafkaProducer] = None
+
+
+def get_producer() -> Optional[KafkaProducer]:
+    """Get or create Kafka producer with error handling."""
+    global _producer
+    if _producer is None:
+        try:
+            _producer = KafkaProducer(
+                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+                value_serializer=lambda v: json.dumps(v).encode("utf-8"),
+                api_version=(0, 10, 1),
+                retries=3,
+                acks='all',
+            )
+            logger.info(f"Kafka producer initialized with servers: {KAFKA_BOOTSTRAP_SERVERS}")
+        except Exception as e:
+            logger.error(f"Failed to initialize Kafka producer: {e}")
+            return None
+    return _producer
+
+
+@app.get("/health")
+def health_check():
+    """Health check endpoint."""
+    return {"status": "healthy", "service": "orders-service"}
 
 
 @app.post("/orders/", response_model=Order)
@@ -45,9 +74,20 @@ def create_order(order: Order) -> Order:
     order.id = order_id
     orders.append(order)
 
-    # Produce Kafka event for payments-service
-    producer.send(KAFKA_ORDER_CREATED_TOPIC, order.dict())
-    producer.flush()
+    # Produce Kafka event for payments-service and notifications-service
+    producer = get_producer()
+    if producer:
+        try:
+            producer.send(KAFKA_ORDER_CREATED_TOPIC, order.dict())
+            producer.flush()
+            logger.info(f"Order {order_id} created and sent to Kafka topic: {KAFKA_ORDER_CREATED_TOPIC}")
+        except KafkaError as e:
+            logger.error(f"Failed to send order to Kafka: {e}")
+            # Don't fail the request if Kafka is down, order is still created
+        except Exception as e:
+            logger.error(f"Unexpected error sending to Kafka: {e}")
+    else:
+        logger.warning("Kafka producer not available, order created but not published to Kafka")
 
     return order
 

@@ -26,6 +26,7 @@ export async function createOrder(input: { user_id: string; item: string; amount
       console.error("createOrder failed status:", res.status, res.statusText);
       throw new Error(`Failed to create order: ${res.status} ${res.statusText}`);
     }
+    return res.json();
   } catch (e) {
     console.error("createOrder network error:", e);
     throw e;
