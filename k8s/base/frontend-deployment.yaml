@@ -22,7 +22,7 @@ spec:
             - containerPort: 80
           env:
             - name: REACT_APP_API_URL
-              value: "http://backend-service" # Internal service DNS or external URL
+              value: "" # Use relative paths so Nginx proxies requests
           resources:
             requests:
               memory: "64Mi"
