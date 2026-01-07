@@ -53,7 +53,10 @@ def get_producer() -> Optional[KafkaProducer]:
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
                 api_version=(0, 10, 1),
                 retries=3,
-                acks='all',
+                acks=1,  # Changed from 'all' to 1 for faster response
+                request_timeout_ms=5000,  # 5 second timeout for requests
+                metadata_max_age_ms=300000,  # Cache metadata for 5 minutes
+                max_block_ms=2000,  # Max time to block on send (2 seconds)
             )
             logger.info(f"Kafka producer initialized with servers: {KAFKA_BOOTSTRAP_SERVERS}")
         except Exception as e:
