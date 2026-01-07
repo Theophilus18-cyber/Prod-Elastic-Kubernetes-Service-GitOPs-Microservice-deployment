@@ -3,7 +3,7 @@ name: Prod Workflow
 on:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   id-token: write
@@ -104,4 +104,4 @@ jobs:
           git config --global user.name "github-actions"
           git add k8s/overlays/prod/kustomization.yaml
           git commit -m "Update image tags to ${{ github.sha }}"
-          git push origin main
+          git push origin master
