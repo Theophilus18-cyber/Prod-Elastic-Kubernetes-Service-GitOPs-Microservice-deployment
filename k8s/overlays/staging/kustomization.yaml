@@ -18,3 +18,18 @@ images:
   newTag: staging-latest
 - name: my-repo/frontend
   newTag: staging-latest
+
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "REPLACE_WITH_STAGING_KAFKA_BROKERS"
+  - target:
+      kind: Job
+      name: kafka-setup
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "REPLACE_WITH_STAGING_KAFKA_BROKERS"

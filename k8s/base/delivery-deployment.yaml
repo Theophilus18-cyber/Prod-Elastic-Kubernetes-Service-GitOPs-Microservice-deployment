@@ -22,7 +22,7 @@ spec:
             - containerPort: 8005
           env:
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
+              value: "PLACEHOLDER_OVERRIDDEN_BY_OVERLAY"
           startupProbe:
             httpGet:
               path: /health

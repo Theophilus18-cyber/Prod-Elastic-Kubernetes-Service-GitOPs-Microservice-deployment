@@ -18,3 +18,18 @@ images:
   newTag: prod-latest
 - name: my-repo/frontend
   newTag: prod-latest
+
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "REPLACE_WITH_PROD_KAFKA_BROKERS"
+  - target:
+      kind: Job
+      name: kafka-setup
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "REPLACE_WITH_PROD_KAFKA_BROKERS"

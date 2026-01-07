@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-setup
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: kafka-setup
+        image: confluentinc/cp-kafka:7.7.7
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          echo "Waiting for Kafka to be ready..."
+          # Basic loop to wait for DNS/Connect
+          for i in {1..10}; do
+            kafka-broker-api-versions --bootstrap-server $KAFKA_BOOTSTRAP_SERVERS > /dev/null 2>&1
+            if [ $? -eq 0 ]; then
+              echo "Kafka is ready!"
+              break
+            fi
+            echo "Waiting for Kafka..."
+            sleep 5
+          done
+
+          echo "Creating topics..."
+          kafka-topics --bootstrap-server $KAFKA_BOOTSTRAP_SERVERS --create --if-not-exists --topic order.created --partitions 3 --replication-factor 2
+          kafka-topics --bootstrap-server $KAFKA_BOOTSTRAP_SERVERS --create --if-not-exists --topic payment.completed --partitions 3 --replication-factor 2
+          
+          echo "Topics created successfully!"
+        env:
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092" # Default, overridden by overlays
+      restartPolicy: OnFailure

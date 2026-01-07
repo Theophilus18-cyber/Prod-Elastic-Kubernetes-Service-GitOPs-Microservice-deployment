@@ -24,3 +24,18 @@ images:
 - name: my-repo/payments-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-payments
   newTag: b68b98886c6c96de589e0c3ab411085c9457c247
+
+patches:
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
+  - target:
+      kind: Job
+      name: kafka-setup
+    patch: |-
+      - op: replace
+        path: /spec/template/spec/containers/0/env/0/value
+        value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"

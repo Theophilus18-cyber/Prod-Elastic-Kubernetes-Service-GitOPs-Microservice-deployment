@@ -53,3 +53,16 @@ module "vault" {
   vpc_cidr      = var.vpc_cidr
   instance_type = "t3.medium" # Larger instance for prod
 }
+
+module "msk" {
+  source = "../../modules/msk"
+
+  environment            = var.environment
+  cluster_name           = "${var.environment}-kafka"
+  vpc_id                 = module.network.vpc_id
+  vpc_cidr_block         = var.vpc_cidr
+  subnet_ids             = module.network.private_subnet_ids
+  number_of_broker_nodes = 2
+  instance_type          = "kafka.t3.small"
+  eks_cluster_sg_id      = module.eks.cluster_security_group_id
+}

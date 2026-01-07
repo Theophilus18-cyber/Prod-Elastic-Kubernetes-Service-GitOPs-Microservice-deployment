@@ -12,3 +12,4 @@ resources:
   - orders-service.yaml
   - payments-deployment.yaml
   - payments-service.yaml
+  - kafka-setup-job.yaml
