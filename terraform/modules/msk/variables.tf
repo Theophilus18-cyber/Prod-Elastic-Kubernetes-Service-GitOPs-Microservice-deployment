@@ -24,9 +24,14 @@ variable "subnet_ids" {
 }
 
 variable "instance_type" {
-  description = "Instance type for MSK brokers"
+  description = "The type of instance to use for the Kafka brokers"
   type        = string
   default     = "kafka.t3.small"
+}
+
+variable "eks_cluster_sg_id" {
+  description = "Security Group ID of the EKS Cluster"
+  type        = string
 }
 
 variable "number_of_broker_nodes" {

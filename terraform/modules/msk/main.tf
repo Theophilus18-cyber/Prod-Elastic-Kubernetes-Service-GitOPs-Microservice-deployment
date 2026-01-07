@@ -34,6 +34,14 @@ resource "aws_security_group" "msk" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    from_port       = 9092
+    to_port         = 9092
+    protocol        = "tcp"
+    security_groups = [var.eks_cluster_sg_id]
+    description     = "Allow Kafka interaction from EKS Cluster"
+  }
+
   tags = {
     Name = "${var.cluster_name}-msk-sg"
   }

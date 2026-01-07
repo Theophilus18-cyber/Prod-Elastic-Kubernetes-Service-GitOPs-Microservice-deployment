@@ -20,6 +20,7 @@ module "eks" {
   node_group_max_size = var.node_group_max_size
   node_group_desired_size = var.node_group_desired_size
   node_instance_types = var.node_instance_types
+  vpc_cidr    = var.vpc_cidr
 }
 
 # Fetch the global OIDC provider (Must be created first)
@@ -71,6 +72,7 @@ module "msk" {
   subnet_ids             = module.network.private_subnet_ids
   number_of_broker_nodes = 2
   instance_type          = "kafka.t3.small"
+  eks_cluster_sg_id      = module.eks.cluster_security_group_id
 }
 
 # NOTE: CloudFront requires the ALB DNS Name which is generated after the Ingress is deployed.
