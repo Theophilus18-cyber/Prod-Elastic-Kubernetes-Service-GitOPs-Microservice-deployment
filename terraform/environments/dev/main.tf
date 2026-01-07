@@ -61,6 +61,18 @@ module "vault" {
   instance_type = "t3.small"
 }
 
+module "msk" {
+  source = "../../modules/msk"
+
+  environment            = var.environment
+  cluster_name           = "${var.environment}-kafka"
+  vpc_id                 = module.network.vpc_id
+  vpc_cidr_block         = var.vpc_cidr
+  subnet_ids             = module.network.private_subnet_ids
+  number_of_broker_nodes = 2
+  instance_type          = "kafka.t3.small"
+}
+
 # NOTE: CloudFront requires the ALB DNS Name which is generated after the Ingress is deployed.
 # You can uncomment this module after the Ingress is created and you have the ALB DNS.
 # module "cloudfront" {
