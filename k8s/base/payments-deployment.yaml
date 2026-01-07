@@ -23,6 +23,30 @@ spec:
           env:
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
           resources:
             requests:
               memory: "128Mi"
