@@ -86,12 +86,13 @@ def create_order(order: Order) -> Order:
             try:
                 # send() is asynchronous - it returns immediately
                 # The producer will buffer and send when Kafka is available
-                future = producer.send(KAFKA_ORDER_CREATED_TOPIC, order.dict())
+                future = producer.send(KAFKA_ORDER_CREATED_TOPIC, order.model_dump())
                 logger.info(f"Order {order_id} created, Kafka message queued for topic: {KAFKA_ORDER_CREATED_TOPIC}")
-                # Don't call flush() - it blocks and can timeout
-                # Messages will be sent automatically by the producer's background thread
+                # Flush with short timeout to ensure message is sent
+                producer.flush(timeout=2)
+                logger.info(f"Order {order_id} Kafka message sent successfully")
             except KafkaError as e:
-                logger.error(f"Failed to queue order to Kafka: {e}")
+                logger.error(f"Failed to send order to Kafka: {e}")
                 # Don't fail the request if Kafka is down, order is still created
             except Exception as e:
                 logger.error(f"Unexpected error sending to Kafka: {e}")

@@ -2,11 +2,13 @@ import json
 import os
 import threading
 import logging
+import time
 from typing import List, Optional
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from kafka import KafkaConsumer, KafkaProducer
-from kafka.errors import KafkaError
+from kafka.errors import KafkaError, NoBrokersAvailable
 
 
 KAFKA_BOOTSTRAP_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "kafka:9092").split(",")
@@ -18,34 +20,46 @@ KAFKA_PAYMENTS_GROUP_ID = os.getenv("KAFKA_PAYMENTS_GROUP_ID", "payments-group")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Payments Service")
+# In-memory "database" of processed payments
+payments: List[dict] = []
 
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Initialize Kafka consumer with error handling
-try:
-    consumer = KafkaConsumer(
-        KAFKA_ORDER_CREATED_TOPIC,
-        bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
-        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
-        auto_offset_reset="earliest",
-        group_id=KAFKA_PAYMENTS_GROUP_ID,
-    )
-    logger.info(f"Kafka consumer initialized for topic: {KAFKA_ORDER_CREATED_TOPIC}")
-except Exception as e:
-    logger.error(f"Failed to initialize Kafka consumer: {e}")
-    consumer = None
-
-# Lazy initialization of Kafka producer
+# Global consumer and producer references
+_consumer: Optional[KafkaConsumer] = None
 _producer: Optional[KafkaProducer] = None
+_consumer_thread: Optional[threading.Thread] = None
+_shutdown_event = threading.Event()
+
+
+def create_consumer(max_retries: int = 10, retry_delay: int = 5) -> Optional[KafkaConsumer]:
+    """Create Kafka consumer with retry logic for MSK connectivity."""
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"Attempting to connect to Kafka (attempt {attempt + 1}/{max_retries})...")
+            logger.info(f"Bootstrap servers: {KAFKA_BOOTSTRAP_SERVERS}")
+            
+            consumer = KafkaConsumer(
+                KAFKA_ORDER_CREATED_TOPIC,
+                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+                value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+                auto_offset_reset="earliest",
+                group_id=KAFKA_PAYMENTS_GROUP_ID,
+                consumer_timeout_ms=1000,  # Poll timeout for graceful shutdown
+                session_timeout_ms=30000,
+                heartbeat_interval_ms=10000,
+            )
+            logger.info(f"Kafka consumer initialized for topic: {KAFKA_ORDER_CREATED_TOPIC}")
+            return consumer
+        except NoBrokersAvailable as e:
+            logger.warning(f"No Kafka brokers available (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+        except Exception as e:
+            logger.error(f"Failed to initialize Kafka consumer (attempt {attempt + 1}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+    
+    logger.error("Failed to connect to Kafka after all retries")
+    return None
 
 
 def get_producer() -> Optional[KafkaProducer]:
@@ -58,10 +72,10 @@ def get_producer() -> Optional[KafkaProducer]:
                 value_serializer=lambda v: json.dumps(v).encode("utf-8"),
                 api_version=(0, 10, 1),
                 retries=3,
-                acks=1,  # Changed from 'all' to 1 for faster response
-                request_timeout_ms=5000,  # 5 second timeout for requests
-                metadata_max_age_ms=300000,  # Cache metadata for 5 minutes
-                max_block_ms=2000,  # Max time to block on send (2 seconds)
+                acks=1,
+                request_timeout_ms=5000,
+                metadata_max_age_ms=300000,
+                max_block_ms=2000,
             )
             logger.info(f"Kafka producer initialized with servers: {KAFKA_BOOTSTRAP_SERVERS}")
         except Exception as e:
@@ -69,39 +83,90 @@ def get_producer() -> Optional[KafkaProducer]:
             return None
     return _producer
 
-# In-memory "database" of processed payments for local testing
-payments: List[dict] = []
-
 
 def consume_orders() -> None:
-    if consumer is None:
+    """Consumer loop with proper shutdown handling."""
+    global _consumer
+    
+    logger.info("Starting Kafka consumer thread...")
+    _consumer = create_consumer()
+    
+    if _consumer is None:
         logger.error("Kafka consumer not available, cannot consume orders")
         return
     
-    try:
-        for message in consumer:
-            order = message.value
-            logger.info(f"Received order: {order}")
+    logger.info("Consumer thread started, waiting for messages...")
+    message_count = 0
+    
+    while not _shutdown_event.is_set():
+        try:
+            # Poll for messages with timeout
+            for message in _consumer:
+                if _shutdown_event.is_set():
+                    break
+                    
+                order = message.value
+                message_count += 1
+                logger.info(f"Received order #{message_count}: {order}")
 
-            payment = {
-                "payment_id": len(payments) + 1,
-                "order_id": order.get("id"),
-                "user_id": order.get("user_id"),
-                "item": order.get("item"),
-                "amount": order.get("amount"),
-                "status": "PENDING",
-            }
-            payments.append(payment)
-            logger.info(f"Payment pending: {payment}")
-    except Exception as e:
-        logger.error(f"Error consuming orders: {e}")
+                payment = {
+                    "payment_id": len(payments) + 1,
+                    "order_id": order.get("id"),
+                    "user_id": order.get("user_id"),
+                    "item": order.get("item"),
+                    "amount": order.get("amount"),
+                    "status": "PENDING",
+                }
+                payments.append(payment)
+                logger.info(f"Payment created: {payment}")
+                
+        except StopIteration:
+            # consumer_timeout_ms reached, continue loop
+            continue
+        except Exception as e:
+            logger.error(f"Error consuming orders: {e}")
+            time.sleep(1)  # Brief pause before retrying
+    
+    logger.info("Consumer thread shutting down...")
+    if _consumer:
+        _consumer.close()
 
 
-# Start Kafka consumer in a background thread when the app starts
-if consumer is not None:
-    threading.Thread(target=consume_orders, daemon=True).start()
-else:
-    logger.warning("Kafka consumer not initialized, payment consumption disabled")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Manage startup and shutdown of background consumer."""
+    global _consumer_thread
+    
+    logger.info("Starting payments service...")
+    
+    # Start consumer in background thread
+    _consumer_thread = threading.Thread(target=consume_orders, daemon=True, name="kafka-consumer")
+    _consumer_thread.start()
+    logger.info("Kafka consumer thread started")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down payments service...")
+    _shutdown_event.set()
+    if _consumer_thread and _consumer_thread.is_alive():
+        _consumer_thread.join(timeout=5)
+    if _producer:
+        _producer.close()
+    logger.info("Payments service shutdown complete")
+
+
+app = FastAPI(title="Payments Service", lifespan=lifespan)
+
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/health")
@@ -140,8 +205,9 @@ def process_payment(payment_id: int):
             # The producer will buffer and send when Kafka is available
             future = producer.send(KAFKA_PAYMENT_COMPLETED_TOPIC, event)
             logger.info(f"Payment processed, Kafka message queued for topic: {KAFKA_PAYMENT_COMPLETED_TOPIC}")
-            # Don't call flush() - it blocks and can timeout
-            # Messages will be sent automatically by the producer's background thread
+            # Flush with short timeout to ensure message is sent
+            producer.flush(timeout=2)
+            logger.info(f"Payment {payment_id} Kafka message sent successfully")
         except KafkaError as e:
             logger.error(f"Failed to queue payment event to Kafka: {e}")
             # Don't fail the payment if Kafka is down
