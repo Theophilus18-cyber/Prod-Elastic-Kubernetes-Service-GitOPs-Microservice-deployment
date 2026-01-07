@@ -1,6 +1,9 @@
-const ORDERS_BASE_URL = (import.meta as any).env.VITE_ORDERS_URL ?? "http://localhost:8001";
-const PAYMENTS_BASE_URL = "http://localhost:8002";
-const NOTIFICATIONS_BASE_URL = "http://localhost:8003";
+const API_URL = (import.meta as any).env.VITE_API_URL ?? "";
+
+const ORDERS_BASE_URL = API_URL;
+const PAYMENTS_BASE_URL = API_URL;
+const NOTIFICATIONS_BASE_URL = API_URL;
+const DELIVERY_BASE_URL = API_URL;
 
 export async function createOrder(input: { user_id: string; item: string; amount: number }) {
   const res = await fetch(`${ORDERS_BASE_URL}/orders/`, {
