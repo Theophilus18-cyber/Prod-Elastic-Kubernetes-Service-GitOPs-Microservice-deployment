@@ -47,7 +47,6 @@ export async function listNotifications() {
   return res.json();
 }
 
-const DELIVERY_BASE_URL = "http://localhost:8005";
 
 export async function listDeliveries() {
   const res = await fetch(`${DELIVERY_BASE_URL}/deliveries/`);
