@@ -4,8 +4,10 @@ metadata:
   name: kafka-setup
   annotations:
     argocd.argoproj.io/hook: Sync
-    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded,HookFailed
+    argocd.argoproj.io/sync-options: Replace=true
 spec:
+  ttlSecondsAfterFinished: 300
   template:
     spec:
       containers:
