@@ -8,29 +8,34 @@ commonLabels:
   environment: staging
 
 images:
-- name: my-repo/orders-service
-  newTag: staging-latest
-- name: my-repo/payments-service
-  newTag: staging-latest
 - name: my-repo/delivery-service
-  newTag: staging-latest
-- name: my-repo/notifications-service
-  newTag: staging-latest
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/staging-delivery
+  newTag: 40520e825f9d506158811b7720b660a9ba492252
 - name: my-repo/frontend
-  newTag: staging-latest
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/staging-frontend
+  newTag: 40520e825f9d506158811b7720b660a9ba492252
+- name: my-repo/notifications-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/staging-notifications
+  newTag: 40520e825f9d506158811b7720b660a9ba492252
+- name: my-repo/orders-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/staging-orders
+  newTag: 40520e825f9d506158811b7720b660a9ba492252
+- name: my-repo/payments-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/staging-payments
+  newTag: 40520e825f9d506158811b7720b660a9ba492252
 
 patches:
-  - target:
-      kind: Deployment
-      name: ".*-service"
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "REPLACE_WITH_STAGING_KAFKA_BROKERS"
-  - target:
-      kind: Job
-      name: kafka-setup
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "REPLACE_WITH_STAGING_KAFKA_BROKERS"
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: "REPLACE_WITH_STAGING_KAFKA_BROKERS"
+  target:
+    kind: Deployment
+    name: .*-service
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: "REPLACE_WITH_STAGING_KAFKA_BROKERS"
+  target:
+    kind: Job
+    name: kafka-setup
