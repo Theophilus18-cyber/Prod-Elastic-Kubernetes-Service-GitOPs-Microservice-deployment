@@ -8,29 +8,34 @@ commonLabels:
   environment: prod
 
 images:
-- name: my-repo/orders-service
-  newTag: prod-latest
-- name: my-repo/payments-service
-  newTag: prod-latest
 - name: my-repo/delivery-service
-  newTag: prod-latest
-- name: my-repo/notifications-service
-  newTag: prod-latest
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/prod-delivery
+  newTag: 87f12c3430bd841b182a343233a89996876afce8
 - name: my-repo/frontend
-  newTag: prod-latest
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/prod-frontend
+  newTag: 87f12c3430bd841b182a343233a89996876afce8
+- name: my-repo/notifications-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/prod-notifications
+  newTag: 87f12c3430bd841b182a343233a89996876afce8
+- name: my-repo/orders-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/prod-orders
+  newTag: 87f12c3430bd841b182a343233a89996876afce8
+- name: my-repo/payments-service
+  newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/prod-payments
+  newTag: 87f12c3430bd841b182a343233a89996876afce8
 
 patches:
-  - target:
-      kind: Deployment
-      name: ".*-service"
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "REPLACE_WITH_PROD_KAFKA_BROKERS"
-  - target:
-      kind: Job
-      name: kafka-setup
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "REPLACE_WITH_PROD_KAFKA_BROKERS"
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: "REPLACE_WITH_PROD_KAFKA_BROKERS"
+  target:
+    kind: Deployment
+    name: .*-service
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: "REPLACE_WITH_PROD_KAFKA_BROKERS"
+  target:
+    kind: Job
+    name: kafka-setup
