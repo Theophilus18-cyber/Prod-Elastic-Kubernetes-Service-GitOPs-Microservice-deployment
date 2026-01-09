@@ -12,32 +12,32 @@ commonLabels:
 images:
 - name: my-repo/delivery-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-delivery
-  newTag: b68b98886c6c96de589e0c3ab411085c9457c247
+  newTag: fdd5ca55f6a7f1d32af116abc2429916cefde76b
 - name: my-repo/frontend
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-frontend
-  newTag: b68b98886c6c96de589e0c3ab411085c9457c247
+  newTag: fdd5ca55f6a7f1d32af116abc2429916cefde76b
 - name: my-repo/notifications-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-notifications
-  newTag: b68b98886c6c96de589e0c3ab411085c9457c247
+  newTag: fdd5ca55f6a7f1d32af116abc2429916cefde76b
 - name: my-repo/orders-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-orders
-  newTag: b68b98886c6c96de589e0c3ab411085c9457c247
+  newTag: fdd5ca55f6a7f1d32af116abc2429916cefde76b
 - name: my-repo/payments-service
   newName: 381492025532.dkr.ecr.us-east-1.amazonaws.com/dev-payments
-  newTag: b68b98886c6c96de589e0c3ab411085c9457c247
+  newTag: fdd5ca55f6a7f1d32af116abc2429916cefde76b
 
 patches:
-  - target:
-      kind: Deployment
-      name: ".*-service"
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
-  - target:
-      kind: Job
-      name: kafka-setup
-    patch: |-
-      - op: replace
-        path: /spec/template/spec/containers/0/env/0/value
-        value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
+  target:
+    kind: Deployment
+    name: .*-service
+- patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/env/0/value
+      value: "b-1.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092,b-2.devkafka.bikqyw.c6.kafka.us-east-1.amazonaws.com:9092"
+  target:
+    kind: Job
+    name: kafka-setup
