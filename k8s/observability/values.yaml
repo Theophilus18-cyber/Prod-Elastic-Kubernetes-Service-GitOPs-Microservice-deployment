@@ -19,7 +19,10 @@ kube-prometheus-stack:
           cpu: 1000m
 
   grafana:
-    adminPassword: "admin" # Change this in production secrets!
+    admin:
+      existingSecret: "grafana-admin"
+      userKey: admin-user
+      passwordKey: admin-password
     persistence:
       enabled: true
       storageClassName: gp3
