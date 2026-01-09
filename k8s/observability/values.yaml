@@ -1,0 +1,48 @@
+kube-prometheus-stack:
+  prometheus:
+    prometheusSpec:
+      retention: 10d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 50Gi
+      resources:
+        requests:
+          memory: 400Mi
+          cpu: 200m
+        limits:
+          memory: 2Gi
+          cpu: 1000m
+
+  grafana:
+    adminPassword: "admin" # Change this in production secrets!
+    persistence:
+      enabled: true
+      storageClassName: gp3
+      accessModes: ["ReadWriteOnce"]
+      size: 10Gi
+    resources:
+      requests:
+        memory: 100Mi
+        cpu: 100m
+      limits:
+        memory: 512Mi
+        cpu: 500m
+    # If using ALB Ingress Controller, we can enable ingress here or via ArgoCD overrides
+    ingress:
+      enabled: false 
+
+  alertmanager:
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            storageClassName: gp3
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi

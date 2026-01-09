@@ -33,6 +33,7 @@ resource "aws_eks_node_group" "main" {
     aws_iam_role_policy_attachment.node_AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.node_AmazonEKS_CNI_Policy,
     aws_iam_role_policy_attachment.node_AmazonEC2ContainerRegistryReadOnly,
+    aws_iam_role_policy_attachment.node_AmazonEBSCSIDriverPolicy,
   ]
 }
 
@@ -53,6 +54,52 @@ resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.main.name
   addon_name   = "kube-proxy"
   depends_on   = [aws_eks_node_group.main]
+}
+
+# IRSA for EBS CSI Driver
+data "aws_iam_policy_document" "ebs_csi_irsa_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+    effect  = "Allow"
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.main.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "${replace(aws_iam_openid_connect_provider.main.url, "https://", "")}:sub"
+      values   = ["system:serviceaccount:kube-system:ebs-csi-controller-sa"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ebs_csi_irsa" {
+  name               = "${var.cluster_name}-ebs-csi-irsa"
+  assume_role_policy = data.aws_iam_policy_document.ebs_csi_irsa_assume_role_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "ebs_csi_irsa_attachment" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.ebs_csi_irsa.name
+}
+
+resource "aws_eks_addon" "ebs_csi_driver" {
+  cluster_name             = aws_eks_cluster.main.name
+  addon_name               = "aws-ebs-csi-driver"
+  service_account_role_arn = aws_iam_role.ebs_csi_irsa.arn
+  depends_on               = [aws_eks_node_group.main]
+}
+
+resource "aws_security_group_rule" "allow_all_from_vpc" {
+  type              = "ingress"
+  from_port         = 0
+  to_port           = 65535
+  protocol          = "-1"
+  cidr_blocks       = [var.vpc_cidr]
+  security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
+  description       = "Allow all traffic from VPC CIDR to EKS Cluster/Nodes"
 }
 
 # OIDC Provider
@@ -122,12 +169,9 @@ resource "aws_iam_role_policy_attachment" "node_AmazonEC2ContainerRegistryReadOn
   role       = aws_iam_role.node.name
 }
 
-resource "aws_security_group_rule" "allow_all_from_vpc" {
-  type              = "ingress"
-  from_port         = 0
-  to_port           = 65535
-  protocol          = "-1"
-  cidr_blocks       = [var.vpc_cidr]
-  security_group_id = aws_eks_cluster.main.vpc_config[0].cluster_security_group_id
-  description       = "Allow all traffic from VPC CIDR to EKS Cluster/Nodes"
+resource "aws_iam_role_policy_attachment" "node_AmazonEBSCSIDriverPolicy" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy"
+  role       = aws_iam_role.node.name
 }
+
+

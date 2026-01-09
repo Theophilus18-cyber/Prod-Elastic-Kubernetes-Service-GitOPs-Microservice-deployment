@@ -30,3 +30,9 @@ variable "key_name" {
   default     = "my-key" # Placeholder
 }
 
+output "vault_public_ip" {
+  description = "Public IP of the Vault EC2 instance"
+  value       = aws_instance.vault.public_ip
+}
+
+
