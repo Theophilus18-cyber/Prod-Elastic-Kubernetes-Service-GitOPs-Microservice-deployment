@@ -18,6 +18,7 @@ module "eks" {
   node_group_max_size = var.node_group_max_size
   node_group_desired_size = var.node_group_desired_size
   node_instance_types = var.node_instance_types
+  vpc_cidr            = var.vpc_cidr
 }
 
 data "aws_caller_identity" "current" {}
