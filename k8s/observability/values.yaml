@@ -38,6 +38,9 @@ kube-prometheus-stack:
         memory: 512Mi
         cpu: 500m
     # If using ALB Ingress Controller, we can enable ingress here or via ArgoCD overrides
+    sidecar:
+      datasources:
+        url: http://observability-dev-kube-pro-prometheus:9090
     ingress:
       enabled: false 
 

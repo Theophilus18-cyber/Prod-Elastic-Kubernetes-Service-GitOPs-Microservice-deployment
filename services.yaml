@@ -1,0 +1,265 @@
+apiVersion: v1
+items:
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: observability-dev:/Service:observability/observability-dev-grafana
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"observability-dev:/Service:observability/observability-dev-grafana"},"labels":{"app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"grafana","app.kubernetes.io/version":"11.1.0","helm.sh/chart":"grafana-8.3.4"},"name":"observability-dev-grafana","namespace":"observability"},"spec":{"ports":[{"name":"http-web","port":80,"protocol":"TCP","targetPort":3000}],"selector":{"app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/name":"grafana"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-01-09T09:55:22Z"
+    labels:
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: grafana
+      app.kubernetes.io/version: 11.1.0
+      helm.sh/chart: grafana-8.3.4
+    name: observability-dev-grafana
+    namespace: observability
+    resourceVersion: "40076"
+    uid: 80b13525-c813-4ba8-bbe7-a5976a9adad9
+  spec:
+    clusterIP: 172.20.33.147
+    clusterIPs:
+    - 172.20.33.147
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-web
+      port: 80
+      protocol: TCP
+      targetPort: 3000
+    selector:
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/name: grafana
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: observability-dev:/Service:observability/observability-dev-kube-pro-alertmanager
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"observability-dev:/Service:observability/observability-dev-kube-pro-alertmanager"},"labels":{"app":"kube-prometheus-stack-alertmanager","app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/part-of":"kube-prometheus-stack","app.kubernetes.io/version":"61.3.2","chart":"kube-prometheus-stack-61.3.2","heritage":"Helm","release":"observability-dev","self-monitor":"true"},"name":"observability-dev-kube-pro-alertmanager","namespace":"observability"},"spec":{"ports":[{"name":"http-web","port":9093,"protocol":"TCP","targetPort":9093},{"appProtocol":"http","name":"reloader-web","port":8080,"targetPort":"reloader-web"}],"selector":{"alertmanager":"observability-dev-kube-pro-alertmanager","app.kubernetes.io/name":"alertmanager"},"sessionAffinity":"None","type":"ClusterIP"}}
+    creationTimestamp: "2026-01-09T09:55:22Z"
+    labels:
+      app: kube-prometheus-stack-alertmanager
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: kube-prometheus-stack
+      app.kubernetes.io/version: 61.3.2
+      chart: kube-prometheus-stack-61.3.2
+      heritage: Helm
+      release: observability-dev
+      self-monitor: "true"
+    name: observability-dev-kube-pro-alertmanager
+    namespace: observability
+    resourceVersion: "40107"
+    uid: b268ed20-44a1-4095-b4d3-52e641a1a347
+  spec:
+    clusterIP: 172.20.162.172
+    clusterIPs:
+    - 172.20.162.172
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-web
+      port: 9093
+      protocol: TCP
+      targetPort: 9093
+    - appProtocol: http
+      name: reloader-web
+      port: 8080
+      protocol: TCP
+      targetPort: reloader-web
+    selector:
+      alertmanager: observability-dev-kube-pro-alertmanager
+      app.kubernetes.io/name: alertmanager
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: observability-dev:/Service:observability/observability-dev-kube-pro-operator
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"observability-dev:/Service:observability/observability-dev-kube-pro-operator"},"labels":{"app":"kube-prometheus-stack-operator","app.kubernetes.io/component":"prometheus-operator","app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kube-prometheus-stack-prometheus-operator","app.kubernetes.io/part-of":"kube-prometheus-stack","app.kubernetes.io/version":"61.3.2","chart":"kube-prometheus-stack-61.3.2","heritage":"Helm","release":"observability-dev"},"name":"observability-dev-kube-pro-operator","namespace":"observability"},"spec":{"ports":[{"name":"https","port":443,"targetPort":"https"}],"selector":{"app":"kube-prometheus-stack-operator","release":"observability-dev"},"type":"ClusterIP"}}
+    creationTimestamp: "2026-01-09T09:55:22Z"
+    labels:
+      app: kube-prometheus-stack-operator
+      app.kubernetes.io/component: prometheus-operator
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: kube-prometheus-stack-prometheus-operator
+      app.kubernetes.io/part-of: kube-prometheus-stack
+      app.kubernetes.io/version: 61.3.2
+      chart: kube-prometheus-stack-61.3.2
+      heritage: Helm
+      release: observability-dev
+    name: observability-dev-kube-pro-operator
+    namespace: observability
+    resourceVersion: "40080"
+    uid: 1d8f1aa9-feba-41ef-a006-aae0a8be719e
+  spec:
+    clusterIP: 172.20.134.16
+    clusterIPs:
+    - 172.20.134.16
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: https
+      port: 443
+      protocol: TCP
+      targetPort: https
+    selector:
+      app: kube-prometheus-stack-operator
+      release: observability-dev
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: observability-dev:/Service:observability/observability-dev-kube-pro-prometheus
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"observability-dev:/Service:observability/observability-dev-kube-pro-prometheus"},"labels":{"app":"kube-prometheus-stack-prometheus","app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/part-of":"kube-prometheus-stack","app.kubernetes.io/version":"61.3.2","chart":"kube-prometheus-stack-61.3.2","heritage":"Helm","release":"observability-dev","self-monitor":"true"},"name":"observability-dev-kube-pro-prometheus","namespace":"observability"},"spec":{"ports":[{"name":"http-web","port":9090,"targetPort":9090},{"appProtocol":"http","name":"reloader-web","port":8080,"targetPort":"reloader-web"}],"publishNotReadyAddresses":false,"selector":{"app.kubernetes.io/name":"prometheus","operator.prometheus.io/name":"observability-dev-kube-pro-prometheus"},"sessionAffinity":"None","type":"ClusterIP"}}
+    creationTimestamp: "2026-01-09T09:55:22Z"
+    labels:
+      app: kube-prometheus-stack-prometheus
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/part-of: kube-prometheus-stack
+      app.kubernetes.io/version: 61.3.2
+      chart: kube-prometheus-stack-61.3.2
+      heritage: Helm
+      release: observability-dev
+      self-monitor: "true"
+    name: observability-dev-kube-pro-prometheus
+    namespace: observability
+    resourceVersion: "40085"
+    uid: 3678e71d-a1cd-4528-8324-0e2f996ec13a
+  spec:
+    clusterIP: 172.20.255.71
+    clusterIPs:
+    - 172.20.255.71
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-web
+      port: 9090
+      protocol: TCP
+      targetPort: 9090
+    - appProtocol: http
+      name: reloader-web
+      port: 8080
+      protocol: TCP
+      targetPort: reloader-web
+    selector:
+      app.kubernetes.io/name: prometheus
+      operator.prometheus.io/name: observability-dev-kube-pro-prometheus
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: observability-dev:/Service:observability/observability-dev-kube-state-metrics
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"observability-dev:/Service:observability/observability-dev-kube-state-metrics","prometheus.io/scrape":"true"},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"kube-state-metrics","app.kubernetes.io/part-of":"kube-state-metrics","app.kubernetes.io/version":"2.12.0","helm.sh/chart":"kube-state-metrics-5.21.0","release":"observability-dev"},"name":"observability-dev-kube-state-metrics","namespace":"observability"},"spec":{"ports":[{"name":"http","port":8080,"protocol":"TCP","targetPort":8080}],"selector":{"app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/name":"kube-state-metrics"},"type":"ClusterIP"}}
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2026-01-09T09:55:22Z"
+    labels:
+      app.kubernetes.io/component: metrics
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: kube-state-metrics
+      app.kubernetes.io/part-of: kube-state-metrics
+      app.kubernetes.io/version: 2.12.0
+      helm.sh/chart: kube-state-metrics-5.21.0
+      release: observability-dev
+    name: observability-dev-kube-state-metrics
+    namespace: observability
+    resourceVersion: "40111"
+    uid: cde27611-0e9f-4ab9-a645-40417219c4ab
+  spec:
+    clusterIP: 172.20.201.75
+    clusterIPs:
+    - 172.20.201.75
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/name: kube-state-metrics
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      argocd.argoproj.io/tracking-id: observability-dev:/Service:observability/observability-dev-prometheus-node-exporter
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{"argocd.argoproj.io/tracking-id":"observability-dev:/Service:observability/observability-dev-prometheus-node-exporter","prometheus.io/scrape":"true"},"labels":{"app.kubernetes.io/component":"metrics","app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/managed-by":"Helm","app.kubernetes.io/name":"prometheus-node-exporter","app.kubernetes.io/part-of":"prometheus-node-exporter","app.kubernetes.io/version":"1.8.1","helm.sh/chart":"prometheus-node-exporter-4.37.0","jobLabel":"node-exporter","release":"observability-dev"},"name":"observability-dev-prometheus-node-exporter","namespace":"observability"},"spec":{"ports":[{"name":"http-metrics","port":9100,"protocol":"TCP","targetPort":9100}],"selector":{"app.kubernetes.io/instance":"observability-dev","app.kubernetes.io/name":"prometheus-node-exporter"},"type":"ClusterIP"}}
+      prometheus.io/scrape: "true"
+    creationTimestamp: "2026-01-09T09:55:22Z"
+    labels:
+      app.kubernetes.io/component: metrics
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/managed-by: Helm
+      app.kubernetes.io/name: prometheus-node-exporter
+      app.kubernetes.io/part-of: prometheus-node-exporter
+      app.kubernetes.io/version: 1.8.1
+      helm.sh/chart: prometheus-node-exporter-4.37.0
+      jobLabel: node-exporter
+      release: observability-dev
+    name: observability-dev-prometheus-node-exporter
+    namespace: observability
+    resourceVersion: "40101"
+    uid: 00ab547a-c991-42f3-9bfa-fde9fd0ff321
+  spec:
+    clusterIP: 172.20.101.51
+    clusterIPs:
+    - 172.20.101.51
+    internalTrafficPolicy: Cluster
+    ipFamilies:
+    - IPv4
+    ipFamilyPolicy: SingleStack
+    ports:
+    - name: http-metrics
+      port: 9100
+      protocol: TCP
+      targetPort: 9100
+    selector:
+      app.kubernetes.io/instance: observability-dev
+      app.kubernetes.io/name: prometheus-node-exporter
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+kind: List
+metadata:
+  resourceVersion: ""

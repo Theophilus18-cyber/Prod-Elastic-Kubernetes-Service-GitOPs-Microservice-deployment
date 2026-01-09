@@ -1,0 +1,7 @@
+NAME                                         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+observability-dev-grafana                    ClusterIP   172.20.33.147    <none>        80/TCP              10h
+observability-dev-kube-pro-alertmanager      ClusterIP   172.20.162.172   <none>        9093/TCP,8080/TCP   10h
+observability-dev-kube-pro-operator          ClusterIP   172.20.134.16    <none>        443/TCP             10h
+observability-dev-kube-pro-prometheus        ClusterIP   172.20.255.71    <none>        9090/TCP,8080/TCP   10h
+observability-dev-kube-state-metrics         ClusterIP   172.20.201.75    <none>        8080/TCP            10h
+observability-dev-prometheus-node-exporter   ClusterIP   172.20.101.51    <none>        9100/TCP            10h

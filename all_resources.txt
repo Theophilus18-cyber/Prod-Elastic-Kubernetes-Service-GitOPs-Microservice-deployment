@@ -1,0 +1,32 @@
+NAME                                                        READY   STATUS    RESTARTS   AGE
+pod/observability-dev-grafana-6475dcc7d5-grjhk              3/3     Running   0          29m
+pod/observability-dev-kube-pro-operator-5db9667fc5-msfgw    1/1     Running   0          10h
+pod/observability-dev-kube-state-metrics-598756954b-pszq4   1/1     Running   0          10h
+pod/observability-dev-prometheus-node-exporter-h2f7f        1/1     Running   0          10h
+pod/observability-dev-prometheus-node-exporter-p9jhm        1/1     Running   0          10h
+pod/observability-dev-prometheus-node-exporter-pbnxt        1/1     Running   0          7h51m
+pod/observability-dev-prometheus-node-exporter-s4j99        1/1     Running   0          10h
+
+NAME                                                 TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
+service/observability-dev-grafana                    ClusterIP   172.20.33.147    <none>        80/TCP              10h
+service/observability-dev-kube-pro-alertmanager      ClusterIP   172.20.162.172   <none>        9093/TCP,8080/TCP   10h
+service/observability-dev-kube-pro-operator          ClusterIP   172.20.134.16    <none>        443/TCP             10h
+service/observability-dev-kube-pro-prometheus        ClusterIP   172.20.255.71    <none>        9090/TCP,8080/TCP   10h
+service/observability-dev-kube-state-metrics         ClusterIP   172.20.201.75    <none>        8080/TCP            10h
+service/observability-dev-prometheus-node-exporter   ClusterIP   172.20.101.51    <none>        9100/TCP            10h
+
+NAME                                                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+daemonset.apps/observability-dev-prometheus-node-exporter   4         4         4       4            4           kubernetes.io/os=linux   10h
+
+NAME                                                   READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/observability-dev-grafana              1/1     1            1           10h
+deployment.apps/observability-dev-kube-pro-operator    1/1     1            1           10h
+deployment.apps/observability-dev-kube-state-metrics   1/1     1            1           10h
+
+NAME                                                              DESIRED   CURRENT   READY   AGE
+replicaset.apps/observability-dev-grafana-6475dcc7d5              1         1         1       29m
+replicaset.apps/observability-dev-grafana-788f4c897               0         0         0       7h37m
+replicaset.apps/observability-dev-grafana-b44cdfc6b               0         0         0       52m
+replicaset.apps/observability-dev-grafana-c97dc4477               0         0         0       10h
+replicaset.apps/observability-dev-kube-pro-operator-5db9667fc5    1         1         1       10h
+replicaset.apps/observability-dev-kube-state-metrics-598756954b   1         1         1       10h
