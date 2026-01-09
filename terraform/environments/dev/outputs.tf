@@ -17,3 +17,7 @@ output "msk_bootstrap_brokers" {
 output "msk_zookeeper_connect_string" {
   value = module.msk.zookeeper_connect_string
 }
+
+output "vault_public_ip" {
+  value = module.vault.vault_server_ip
+}

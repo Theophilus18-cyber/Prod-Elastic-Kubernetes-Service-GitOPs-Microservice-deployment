@@ -57,7 +57,7 @@ module "vault" {
 
   environment   = var.environment
   vpc_id        = module.network.vpc_id
-  subnet_id     = module.network.private_subnet_ids[0] # Place in private subnet
+  subnet_id     = module.network.public_subnet_ids[0] # Place in public subnet for SSH access (Dev/Demo only)
   vpc_cidr      = var.vpc_cidr
   instance_type = "t3.small"
 }
